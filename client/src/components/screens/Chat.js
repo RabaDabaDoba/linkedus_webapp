@@ -15,14 +15,23 @@ class MessagesContent extends React.Component {
     super(props)
     this.state = {
       posts: [],
-      message: ''
+      from_id: null,
+      to_id: null,
+      chat_id: null,
+      message: null,
+      sendMessage: 'This is a hardcoded message',
+      messagingTo: null
     }
   }
 
   cardClick = (i) => {
     alert('SENDING TO DB');
       let data = {
-        message: 'sample text'
+        from_id: TEMPID,
+        to_id: this.state.posts[i].to_id,
+        chat_id: this.state.posts[i].chat_id,
+        message: this.state.posts[i].sendMessage
+
       };
       console.log(data);
       fetch('/written-message', {
@@ -89,10 +98,10 @@ class MessagesContent extends React.Component {
         }
       })()}
       </MessageList>
-      <TextComposer className='textcomposer'>
+      <TextComposer className='textcomposer' >
         <Row align="center">
           <TextInput onChangeText= {message => this.setState({message})}/>
-          <SendButton fit onClick={() => this.userSend()}/>
+          <SendButton onClick={(msg) => alert(msg)} fit/>
         </Row>
       </TextComposer>
     </div>
@@ -103,7 +112,7 @@ class MessagesContent extends React.Component {
     return (
       messages
     );
-
+console.log(sendMessage)
 
   }
 }
@@ -141,10 +150,7 @@ class MessagesScreen extends React.Component {
         <div className='phone-content__wrapper'>
         <ThemeProvider>
 
-
                 <MessagesContent />
-
-
 
           </ThemeProvider>
         </div>
