@@ -5,8 +5,8 @@ import { ThemeProvider, Message, MessageText, MessageList, MessageGroup,
 import ArrowBack from '@material-ui/icons/ArrowBackIos';
 import './Chat.css';
 
-
-const TEMPID = 1;
+const TEMPID_1 = 1;
+const TEMPID_2 = 2;
 
 
 class MessagesContent extends React.Component {
@@ -15,22 +15,22 @@ class MessagesContent extends React.Component {
     super(props)
     this.state = {
       posts: [],
-      from_id: null,
-      to_id: null,
+      sender: TEMPID_1,
+      receiver: TEMPID_2,
       chat_id: null,
       message: null,
-      sendMessage: 'This is a hardcoded message',
+      sendMessage: null,
       messagingTo: null
     }
   }
 
-  cardClick = (i) => {
+  sendData = (msg) => {
     alert('SENDING TO DB');
       let data = {
-        from_id: TEMPID,
-        to_id: this.state.posts[i].to_id,
-        chat_id: this.state.posts[i].chat_id,
-        message: this.state.posts[i].sendMessage
+        from_id: this.state.sender,
+        to_id: this.state.receiver,
+        chat_id: 1,
+        message: this.state.sendMessage
 
       };
       console.log(data);
@@ -56,7 +56,13 @@ class MessagesContent extends React.Component {
 
     }
 
+    handleChange = event => {
+    this.setState({
+      sendMessage: event.target.value
+    });
 
+    this.sendData(0);
+  }
 
   componentDidMount(){
     this.getMessages();
@@ -77,7 +83,7 @@ class MessagesContent extends React.Component {
         <MessageList active>
       {(() => {
         switch (item.from_id) {
-          case TEMPID:   return (<MessageGroup onlyFirstWithMeta>
+          case TEMPID_1:   return (<MessageGroup onlyFirstWithMeta>
             <Message date={item.createdDate.substring(11, 16)} isOwn={true}>
               <MessageText className='bubble_right'>
                 {item.message}
@@ -88,7 +94,7 @@ class MessagesContent extends React.Component {
             avatar="https://media.licdn.com/dms/image/C4E03AQFdhqSSucWLTg/profile-displayphoto-shrink_800_800/0?e=1550102400&v=beta&t=dsJgTRO-OBZ1GzdaZH7cv9XKqsczC0UJV5KK_PhXtFI"
             onlyFirstWithMeta>
             <Message authorName="Weiqing Huang" date= {item.createdDate.substring(11, 16)}>
-              <MessageText className='bubble_left' onClick={() => this.cardClick(i)}>
+              <MessageText className='bubble_left'>
                 {item.message}
               </MessageText>
             </Message>
@@ -100,11 +106,12 @@ class MessagesContent extends React.Component {
       </MessageList>
       <TextComposer className='textcomposer' >
         <Row align="center">
-          <TextInput onChangeText= {message => this.setState({message})}/>
-          <SendButton onClick={(msg) => alert(msg)} fit/>
+          <input placeholder="Enter message" onSend={this.handleChange} type='sendMessage'/>
+          <SendButton onClick={() => this.sendData(i)} fit/>
         </Row>
       </TextComposer>
     </div>
+
 
     ));
 
@@ -112,7 +119,7 @@ class MessagesContent extends React.Component {
     return (
       messages
     );
-console.log(sendMessage)
+
 
   }
 }
@@ -150,7 +157,10 @@ class MessagesScreen extends React.Component {
         <div className='phone-content__wrapper'>
         <ThemeProvider>
 
+
                 <MessagesContent />
+
+
 
           </ThemeProvider>
         </div>
