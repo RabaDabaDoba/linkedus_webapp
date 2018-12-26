@@ -5,28 +5,41 @@ import { ThemeProvider, ChatList, ChatListItem, Avatar, Column, Row, Title, Subt
 
 import './Messages.css';
 
-class ChatsContent extends React.Component {
+
+class MessagesScreen extends React.Component {
+
   state = {
-    posts: []
+    test: []
   }
-
   componentDidMount(){
-    this.getChats();
+    this.getTest();
   }
 
-  getChats = _ => {
-    fetch('/api/chats')
+  getTest = _ => {
+    fetch('/api/test')
       .then(response => response.json())
       .then(response => this.setState({ posts:response.data }))
       .catch(err => console.error(err))
   }
 
-
-
-
   render() {
-    const chats = this.state.posts.map((item, i) => (
-
+    const message = this.state.posts.map((item, i) => (
+    	<div className='phone'>
+    		<div className='phone__header'>
+	          <SearchBar
+	            onChange={() => console.log('onChange')}
+	            onRequestSearch={() => console.log('onRequestSearch')}
+	            style={{
+	              backgroundColor: 'rgba(255,255,255,0.3)',
+	              width: '100%',
+	              height: '60%',
+	              margin: '0 1em',
+	              boxShadow: 'none',
+	              borderRadius: '30px',
+	            }}
+	          />
+	        </div>
+          <div className='card-content__line--sub'>{item.title}</div>
         <ThemeProvider>
 				<ChatList className='chatlist'>
 				  <Link to='/chat' className='router_link'>
@@ -34,56 +47,33 @@ class ChatsContent extends React.Component {
 					    <Avatar className='avatar' imgUrl='https://media.licdn.com/dms/image/C4E03AQFdhqSSucWLTg/profile-displayphoto-shrink_800_800/0?e=1550102400&v=beta&t=dsJgTRO-OBZ1GzdaZH7cv9XKqsczC0UJV5KK_PhXtFI' />
 					    <Column className='message_content'>
 					      <Row justify>
-
-					        <Title ellipsis>{item.title}</Title>
-
-					        <Subtitle nowrap>{item.createdDate.substring(0, 10) + " " + item.createdDate.substring(11, 16)}</Subtitle>
+                  /*The title should be the name of the other person*/
+					        <Title ellipsis>{'Weiqing'}</Title>
+                  /*this time should be tanken from the database*/
+					        <Subtitle nowrap>{'14:31 PM'}</Subtitle>
 					      </Row>
-
+                /* This string should be the most recent message in the chatä*/
 					      <Subtitle ellipsis>
 					        {'Hello, I also love DevOps, though not many friends of mine are doing the same.'}
 					      </Subtitle>
 					    </Column>
 				  	</ChatListItem>
+
+            /*End of*/
+
             </Link>
   				</ChatList>
 			</ThemeProvider>
+    	</div>
     ));
 
     return (
-      chats
+      message
     );
 
   }
 
 }
 
-class ChatsScreen extends React.Component{
 
-  render() {
-    return (
-      <div className='phone'>
-        <div className='phone__header'>
-            <SearchBar
-              onChange={() => console.log('onChange')}
-              onRequestSearch={() => console.log('onRequestSearch')}
-              style={{
-                backgroundColor: 'rgba(255,255,255,0.3)',
-                width: '100%',
-                height: '60%',
-                margin: '0 1em',
-                boxShadow: 'none',
-                borderRadius: '30px',
-              }}
-            />
-          </div>
-
-        <div className='phone-content__wrapper'>
-          <ChatsContent />
-        </div>
-      </div>
-    );
-  }
-}
-
-export default ChatsScreen;
+export default MessagesScreen;

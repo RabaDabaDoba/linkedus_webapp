@@ -3,76 +3,161 @@ import { Link } from 'react-router-dom';
 import { ThemeProvider, Message, MessageText, MessageList, MessageGroup,
   TextComposer, Row, TextInput, SendButton } from '@livechat/ui-kit';
 import ArrowBack from '@material-ui/icons/ArrowBackIos';
-
 import './Chat.css';
 
 
-class ChatScreen extends React.Component {
+const TEMPID = 1;
+
+
+class MessagesContent extends React.Component {
+
+  constructor(props){
+    super(props)
+    this.state = {
+      posts: [],
+      message: ''
+    }
+  }
+
+  cardClick = (i) => {
+    alert('SENDING TO DB');
+      let data = {
+        message: 'sample text'
+      };
+      console.log(data);
+      fetch('/written-message', {
+        method:'POST',
+        body: JSON.stringify(data),
+        headers: {
+              "Content-Type": "application/json"
+          }
+
+      }).then((res)=>{
+        if(res.ok){
+          return res.json();
+        }
+        else{
+          throw new Error ('Wrong');
+        }
+      })
+      .then((json)=>{
+        console.log(json);
+      })
+
+
+    }
+
+
+
+  componentDidMount(){
+    this.getMessages();
+  }
+
+  getMessages = _ => {
+    fetch('/api/messages')
+      .then(response => response.json())
+      .then(response => this.setState({ posts:response.data }))
+      .catch(err => console.error(err))
+  }
+
   render() {
+
+    const messages = this.state.posts.map((item, i) => (
+
+      <div className='messenger'>
+        <MessageList active>
+      {(() => {
+        switch (item.from_id) {
+          case TEMPID:   return (<MessageGroup onlyFirstWithMeta>
+            <Message date={item.createdDate.substring(11, 16)} isOwn={true}>
+              <MessageText className='bubble_right'>
+                {item.message}
+              </MessageText>
+            </Message>
+          </MessageGroup>);
+          default:      return(<MessageGroup
+            avatar="https://media.licdn.com/dms/image/C4E03AQFdhqSSucWLTg/profile-displayphoto-shrink_800_800/0?e=1550102400&v=beta&t=dsJgTRO-OBZ1GzdaZH7cv9XKqsczC0UJV5KK_PhXtFI"
+            onlyFirstWithMeta>
+            <Message authorName="Weiqing Huang" date= {item.createdDate.substring(11, 16)}>
+              <MessageText className='bubble_left' onClick={() => this.cardClick(i)}>
+                {item.message}
+              </MessageText>
+            </Message>
+          </MessageGroup>
+
+        );
+        }
+      })()}
+      </MessageList>
+      <TextComposer className='textcomposer'>
+        <Row align="center">
+          <TextInput onChangeText= {message => this.setState({message})}/>
+          <SendButton fit onClick={() => this.userSend()}/>
+        </Row>
+      </TextComposer>
+    </div>
+
+    ));
+
+
     return (
-    	<div className='phone'>
+      messages
+    );
+
+
+  }
+}
+
+class MessagesScreen extends React.Component {
+  state = {
+    posts: []
+  }
+
+  componentDidMount(){
+    this.getNameChat();
+  }
+
+  getNameChat = _ => {
+    fetch('/api/name-chat')
+      .then(response => response.json())
+      .then(response => this.setState({ posts:response.data }))
+      .catch(err => console.error(err))
+  }
+
+
+  render() {
+    const messageTop = this.state.posts.map((item, i) => (
+      <div className='phone'>
         <div className='phone__header'>
           <Link to='/messages' style={{ color:'white' }}><span><ArrowBack /></span></Link>
           {/* <span>Michale Smith</span> */}
-          <span>Weiqing Huang</span>
+          <span>{item.name}</span>
           <a href="https://www.linkedin.com/in/wqhuang-ustc/"
             rel="noopener noreferrer"
             style={{ color:'white'}}
             ><span className='fab fa-linkedin' /></a>
         </div>
 
+        <div className='phone-content__wrapper'>
         <ThemeProvider>
-          <div className='messenger'>
-            <MessageList active>
-              <MessageGroup
-                avatar="https://media.licdn.com/dms/image/C4E03AQFdhqSSucWLTg/profile-displayphoto-shrink_800_800/0?e=1550102400&v=beta&t=dsJgTRO-OBZ1GzdaZH7cv9XKqsczC0UJV5KK_PhXtFI"
-                onlyFirstWithMeta
-              >
-                <Message authorName="Weiqing Huang" date="21:37">
-                  <MessageText className='bubble_left'>
-                    Hello, how are you? I'm Jon, nice to meet you!
-                  </MessageText>
-                </Message>
-                <Message authorName="Weiqing Huang" date="21:37">
-                  <MessageText className='bubble_left'>
-                    I also love DevOps, though not many friends of mine are doing the same.
-                  </MessageText>
-                </Message>
-                <Message authorName="Weiqing Huang" date="21:37">
-                  <MessageText className='bubble_left'>
-                    Some techniques like Kubernetes are super useful.
-                  </MessageText>
-                </Message>
-              </MessageGroup>
-              <MessageGroup onlyFirstWithMeta>
-                <Message date="21:38" isOwn={true}>
-                  <MessageText className='bubble_right'>
-                    Nice to meet you!
-                  </MessageText>
-                </Message>
-                <Message date="21:38" isOwn={true}>
-                  <MessageText className='bubble_right'>
-                    Let's meet up?
-                  </MessageText>
-                </Message>
-              </MessageGroup>
-            </MessageList>
-            <TextComposer
-              className='textcomposer'
-              >
-              <Row align="center">
-                <TextInput />
-                <SendButton fit />
-              </Row>
-            </TextComposer>
-          </div>
-          
-        </ThemeProvider>
 
 
-    	</div>
-    );
+                <MessagesContent />
+
+
+
+          </ThemeProvider>
+        </div>
+
+
+      </div>
+
+
+
+
+    ));
+    return (messageTop);
   }
 }
 
-export default ChatScreen;
+export default MessagesScreen;
