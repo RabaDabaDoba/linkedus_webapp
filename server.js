@@ -4,25 +4,11 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
 const port = process.env.PORT || 5000;
-const connection = mysql.createConnection({
-  host: '18.188.104.144',
-  user: 'linkedus',
-  password: '12345678',
-  database: 'linkedus'
-});
+const db = require('./db');
 
-connection.connect(err => {
-  if (err) throw err;
-});
+const TEMPID = 1;
 
 
-// axios.get('/home')
-// .then(function (response) {
-//   console.log(response);
-// })
-// .catch(function (error) {
-//   console.log(error);
-// });
   app.use(bodyParser.urlencoded())
   app.use(bodyParser.json())
 
@@ -32,7 +18,7 @@ connection.connect(err => {
     //console.log(req.method);
     var addsql = 'INSERT IGNORE INTO user_info (name, photo, title, location, summary, saveActive) VALUES(?,?,?,?,?,0)';
     var sqlparams = [req.body.Name, req.body.pictureURL, req.body.headline, req.body.location, req.body.summary];
-    connection.query(addsql,sqlparams,function(err,result){
+    db.query(addsql,sqlparams,function(err,result){
       if(err){
         console.log('[INSERT ERROR] -', err.message);
         return;
@@ -49,7 +35,7 @@ connection.connect(err => {
 
 
 
-/*connection.query(addsql,sqlparams,function(err,result){
+/*db.query(addsql,sqlparams,function(err,result){
   if(err){
     console.log('[INSERT ERROR] -', err.message);
     return;
@@ -64,7 +50,7 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 // API calls
 app.get('/api/userinfo', (req, res) => {
-  connection.query('SELECT * FROM user_info;', (err, results) => {
+  db.query('SELECT * FROM user_info WHERE title = "CEO";', (err, results) => {
     if(err) return res.send(err);
     return res.json({
         data: results
@@ -73,13 +59,62 @@ app.get('/api/userinfo', (req, res) => {
 });
 
 app.get('/api/usersaved', (req, res) => {
-  connection.query('SELECT * FROM user_info WHERE saveActive = 1;',(err, results) => {
+  db.query('SELECT * FROM user_info WHERE saveActive = 1;',(err, results) => {
     if(err) return res.send(err);
     return res.json({
         data: results
     })
   })
 });
+
+app.get('/api/test', (req, res) => {
+  db.query('SELECT * FROM user_info WHERE title = "CEO";',(err, results) => {
+    if(err) return res.send(err);
+    return res.json({
+        data: results
+    })
+  })
+});
+
+app.get('/api/chats', (req, res) => {
+  db.query('SELECT * FROM chat WHERE user_id_1 = ?;',TEMPID, (err, results) => {
+    if(err) return res.send(err);
+    return res.json({
+        data: results
+    })
+  })
+});
+
+app.get('/api/messages', (req, res) => {
+  db.query('SELECT * FROM message WHERE chat_id = ?', 1,(err, results) => {
+    if(err) return res.send(err);
+    return res.json({
+        data: results
+    })
+  })
+});
+
+app.get('/api/name-chat', (req, res) => {
+  db.query('SELECT name FROM user_info WHERE user_id = ?', 2,(err, results) => {
+    if(err) return res.send(err);
+    return res.json({
+        data: results
+    })
+  })
+});
+
+app.post('/written-message', function(req, res) {
+  var addsql = 'INSERT INTO message (from_id, to_id, chat_id, message) VALUES (?,?,?,?)';
+  var sqlparams = [1,2,1,'WORK'];
+  db.query(addsql,sqlparams,function(err,result){
+    if(err){
+      console.log('[INSERT ERROR] -', err.message);
+      return;
+    }
+  });
+});
+
+
 
 if (process.env.NODE_ENV === 'production') {
   // Serve any static files
