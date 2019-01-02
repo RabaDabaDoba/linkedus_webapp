@@ -5,9 +5,12 @@ import { ThemeProvider, ChatList, ChatListItem, Avatar, Column, Row, Title, Subt
 
 import './Messages.css';
 
+var test = "JA FÖR FAN";
+
 class ChatsContent extends React.Component {
   state = {
-    posts: []
+    posts: [],
+    otherID : null
   }
 
   componentDidMount(){
@@ -21,16 +24,25 @@ class ChatsContent extends React.Component {
       .catch(err => console.error(err))
   }
 
+  handleChange = event => {
+    alert("hejsa");
+  this.setState({
+    otherID: event.target.value
+  });
 
+  module.exports = { a: 'b' };
+  alert("sdjkf");
+  }
 
 
   render() {
+    //this.state.otherID = 2;
     const chats = this.state.posts.map((item, i) => (
 
         <ThemeProvider>
 				<ChatList className='chatlist'>
 				  <Link to='/chat' className='router_link'>
-				  	<ChatListItem className='chatlist_item'>
+				  	<ChatListItem className='chatlist_item' onClick={this.handleChange}>
 					    <Avatar className='avatar' imgUrl='https://media.licdn.com/dms/image/C4E03AQFdhqSSucWLTg/profile-displayphoto-shrink_800_800/0?e=1550102400&v=beta&t=dsJgTRO-OBZ1GzdaZH7cv9XKqsczC0UJV5KK_PhXtFI' />
 					    <Column className='message_content'>
 					      <Row justify>
@@ -49,7 +61,8 @@ class ChatsContent extends React.Component {
   				</ChatList>
 			</ThemeProvider>
     ));
-
+    //<TextInput onChangeText= {message => this.setState({message})}/>
+    //<SendButton onClick={() => this.cardClick(i)} fit>
     return (
       chats
     );
