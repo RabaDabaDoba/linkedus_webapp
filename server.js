@@ -6,6 +6,7 @@ const app = express();
 const port = process.env.PORT || 5000;
 const db = require('./db');
 
+//Jessies version could work as well
 const TEMPID = 1;
 
 
@@ -105,7 +106,7 @@ app.get('/api/name-chat', (req, res) => {
 
 app.post('/written-message', function(req, res) {
   var addsql = 'INSERT INTO message (from_id, to_id, chat_id, message) VALUES (?,?,?,?)';
-  var sqlparams = [1,2,1,'WORK'];
+  var sqlparams = [1,2,1,req.body.message];
   db.query(addsql,sqlparams,function(err,result){
     if(err){
       console.log('[INSERT ERROR] -', err.message);
